@@ -472,6 +472,7 @@ function handleDouble(event) {
   writeConfig({
     double: doubleEnabled,
   });
+  if (visiblePage) visiblePage.scrollIntoView();
 }
 
 function handleFiller(event) {
