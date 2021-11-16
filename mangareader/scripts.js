@@ -4,7 +4,6 @@
 const storageKey = 'mangareader-config';
 
 const defaultConfig = {
-  smoothScroll: true,
   darkMode: true,
   seamless: true,
   double: false,
@@ -15,33 +14,6 @@ const screenClamp = {
   none: 'none',
   shrink: 'shrink',
   fit: 'fit',
-};
-
-const orientation = {
-  portrait: 'portrait',
-  square: 'square',
-  landscape: 'landscape',
-};
-
-const smartFit = {
-  size0: {
-    portrait: {
-      width: 720,
-      height: 1024,
-    },
-    landscape: {
-      height: 800,
-    },
-  },
-  size1: {
-    portrait: {
-      width: 1080,
-      height: 1440,
-    },
-    landscape: {
-      height: 1080,
-    },
-  },
 };
 
 const pageTemplate = (id, imgsrc) => `
@@ -94,46 +66,6 @@ function onIntersectChange(targetIntersectHandler, intersectThreshold) {
   );
 }
 
-function asyncTimeout(millis) {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), millis);
-  });
-}
-
-/**
- * Returns a throttled version of a given input function, which will be executed at most once
- * every `millis` milliseconds. At the end of each period, the most recent invocation will be
- * executed. Execution also happens immediately if invoked while no throttle window is in
- * progress.
- * @param {(...args: any[]) => void} func Function to be throttled
- * @param {number} millis Throttle time in milliseconds
- */
-function throttle(func, millis) {
-  let active, lastArgs, count;
-  return async (...args) => {
-    if (!active) {
-      active = true;
-      lastArgs = args;
-      func(...args);
-      count = 0;
-      while (true) {
-        await asyncTimeout(millis);
-        if (count) {
-          count = 0;
-          func(...lastArgs);
-        } else {
-          break;
-        }
-      }
-      // eslint-disable-next-line require-atomic-updates
-      active = false;
-    } else {
-      count++;
-      lastArgs = args;
-    }
-  };
-}
-
 /**
  * Creates a wrapper around `requestAnimationFrame` to enable a simpler task-based API for using
  * it. The wrapper object defines an `addTask` function that can be invoked to schedule a task to
@@ -174,12 +106,12 @@ const shrinkWidthBtn = document.getElementById('btn-shrink-width');
 const shrinkHeightBtn = document.getElementById('btn-shrink-height');
 const fitWidthBtn = document.getElementById('btn-fit-width');
 const fitHeightBtn = document.getElementById('btn-fit-height');
-const smartFitBtns = Array.from(document.getElementsByClassName('btn-smart-fit'));
-const smoothScrollCheckbox = document.getElementById('input-smooth-scroll');
+
 const darkModeCheckbox = document.getElementById('input-dark-mode');
 const seamlessCheckbox = document.getElementById('input-seamless');
 const doubleCheckbox = document.getElementById('input-double');
 const fillerCheckbox = document.getElementById('input-filler');
+
 const scrubberContainerDiv = document.getElementById('scrubber-container');
 const scrubberDiv = document.getElementById('scrubber');
 const scrubberPreviewDiv = document.getElementById('scrubber-preview');
@@ -204,14 +136,6 @@ const intersectObserver = onIntersectChange((target) => {
   setScrubberMarkerActive(visiblePageIndex);
 }, 0.2);
 
-const imagesMeta = images.map((image) => {
-  const ratio = image.naturalWidth / image.naturalHeight;
-  return {
-    image,
-    orientation: ratio > 1 ? 'landscape' : 'portrait',
-  };
-});
-
 function readConfig() {
   let config;
   try {
@@ -235,20 +159,10 @@ function writeConfig(config) {
 
 function loadSettings() {
   const config = readConfig();
-  setupZenscroll(config);
   setupDarkMode(config);
   setupSeamless(config);
   setupDouble(config);
   setupFiller(config);
-}
-
-function setupZenscroll(config) {
-  window.zenscroll.setup(170);
-  if (config.smoothScroll) {
-    smoothScrollCheckbox.checked = true;
-  } else {
-    window.pauseZenscroll = true;
-  }
 }
 
 function setupDarkMode(config) {
@@ -310,11 +224,6 @@ function handleShrinkWidth() {
 
 function handleShrinkHeight() {
   setImagesHeight(screenClamp.shrink, getHeight());
-}
-
-function handleSmartWidth(event) {
-  const key = event.target.dataset.fitKey;
-  smartFitImages(smartFit[key]);
 }
 
 function setImagesWidth(fitMode, width) {
@@ -405,37 +314,6 @@ function setImagesDimensions(fitMode, width, height) {
   visiblePage.scrollIntoView();
 }
 
-function smartFitImages(fitMode) {
-  for (const { image: img, orientation: orient } of imagesMeta) {
-    switch (orient) {
-      case orientation.portrait:
-        Object.assign(img.style, {
-          width: null,
-          maxWidth: null,
-          height: null,
-          maxHeight: `${fitMode.portrait.height}px`,
-        });
-        break;
-      case orientation.landscape:
-        Object.assign(img.style, {
-          width: null,
-          maxWidth: `${getWidth()}px`,
-          height: null,
-          maxHeight: `${fitMode.landscape.height}px`,
-        });
-        break;
-    }
-  }
-  visiblePage.scrollIntoView({ behavior: 'smooth' });
-}
-
-function handleSmoothScroll(event) {
-  window.pauseZenscroll = !event.target.checked;
-  writeConfig({
-    smoothScroll: event.target.checked,
-  });
-}
-
 function handleDarkMode(event) {
   const darkModeEnabled = event.target.checked;
   if (darkModeEnabled) {
@@ -497,30 +375,69 @@ function setupListeners() {
   fitWidthBtn.addEventListener('click', handleFitWidth);
   fitHeightBtn.addEventListener('click', handleFitHeight);
 
-  for (const button of smartFitBtns) {
-    button.addEventListener('click', handleSmartWidth);
-  }
-  smoothScrollCheckbox.addEventListener('change', handleSmoothScroll);
   darkModeCheckbox.addEventListener('change', handleDarkMode);
   seamlessCheckbox.addEventListener('change', handleSeamless);
   doubleCheckbox.addEventListener('change', handleDouble);
   fillerCheckbox.addEventListener('change', handleFiller);
 
   window.onkeyup = function (e) { return keyPressed(e); };
+
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+  });
+}
+
+function nav(target) {
+  console.log(target);
+  if(target >= 0 && target < pages.length) {
+    document.getElementById("_"+target).scrollIntoView({behavior: 'smooth'});
+    history.pushState(null, null, "#_"+target);
+  }
 }
 
 function keyPressed(e) {
   var key = e.keyCode ? e.keyCode : e.which;
 
   switch (key) {
+    case 39: //right
+    case 75: //K
+    case 76: //L
+      nav(parseInt(window.location.hash.substr(2))+1+(doubleCheckbox.checked?1:0));
+      break;
+    case 37: //left
+    case 72: //H
+    case 74: //J
+      nav(parseInt(window.location.hash.substr(2))-1-(doubleCheckbox.checked?1:0));
+      break;
+    case 67: //C
+      toggleCheckbox(seamlessCheckbox, true);
+      break;
     case 68: //D
       toggleCheckbox(doubleCheckbox, true);
       break;
     case 70: //F
       toggleCheckbox(fillerCheckbox, true);
       break;
+    case 77: //M
+      toggleCheckbox(darkModeCheckbox, true);
+      break;
+    case 79: //O
+      handleOriginalSize();
+      break;
+    case 83: //S
+      handleShrinkSize();
+      break;
+    case 87: //W
+      handleFitWidth();
+      break;
     default:
-      console.log("Key event: " + key + " " + String.fromCharCode(key));
+      //console.log("Key event: " + key + " " + String.fromCharCode(key));
   }
 }
 

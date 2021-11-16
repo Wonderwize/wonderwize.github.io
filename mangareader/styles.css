@@ -211,7 +211,7 @@ a[href='#_none'], a[href*='#_-'] {
 
   /* Note: this is the exact height of the menu. Must be explicitly set in order to animate
   height transition */
-  height: 678px;
+  height: 556px;
 }
 
 .toolbar .menu-icon {
