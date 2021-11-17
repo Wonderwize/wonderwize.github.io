@@ -115,6 +115,7 @@ const darkModeCheckbox = document.getElementById('input-dark-mode');
 const doubleCheckbox = document.getElementById('input-double');
 const fillerCheckbox = document.getElementById('input-filler');
 
+const dropZone = document.getElementById("drop-zone");
 const mangaPages = document.getElementById("manga-pages");
 const scrubberContainerDiv = document.getElementById('scrubber-container');
 const scrubberDiv = document.getElementById('scrubber');
@@ -500,30 +501,35 @@ async function handleFile(ev) {
       file = ev.dataTransfer.items[0].getAsFile();
   }
 
-  if(file) {
-    const module = await import(`./libarchive.js/main.js`);
-    module.Archive.init({
-      workerUrl: './libarchive.js/dist/worker-bundle.js'
-    });
+  if(file && file.name.match(/.(cbz|cbr|cb7|zip|rar|7z)$/i)) {
+    dropZone.innerHTML = "Chotto a minute...";
+    try {
+      const module = await import(`./libarchive.js/main.js`);
+      module.Archive.init({
+        workerUrl: './libarchive.js/dist/worker-bundle.js'
+      });
 
-    const archive = await module.Archive.open(file);
-    await archive.extractFiles();
-    let files = await archive.getFilesArray();
-    //sort, since the archive might not be ordered correctly
-    files.sort((a,b) => a.file.name.localeCompare(b.file.name));
+      const archive = await module.Archive.open(file);
+      await archive.extractFiles();
+      let files = await archive.getFilesArray();
+      //sort, since the archive might not be ordered correctly
+      files.sort((a,b) => a.file.name.localeCompare(b.file.name));
 
-    files.forEach((entry, index) => {
-      if(entry.file.name.match(/.(jpg|jpeg|png|gif|bmp|svg|webp)$/i)) {
-        let page = pageTemplate(index, URL.createObjectURL(entry.file));
-        mangaPages.appendChild(htmlToElement(page));
-      }
-    });
+      files.forEach((entry, index) => {
+        if(entry.file.name.match(/.(jpg|jpeg|png|gif|bmp|svg|webp)$/i)) {
+          let page = pageTemplate(index, URL.createObjectURL(entry.file));
+          mangaPages.appendChild(htmlToElement(page));
+        }
+      });
 
-    document.querySelector("a[href='#_"+files.length+"']").href = "#_none";
-    pages = Array.from(document.getElementsByClassName('page'));
-    images = Array.from(document.getElementsByClassName('image'));
-    document.getElementById("drop-zone").remove();
-    main();
+      document.querySelector("a[href='#_"+files.length+"']").href = "#_none";
+      pages = Array.from(document.getElementsByClassName('page'));
+      images = Array.from(document.getElementsByClassName('image'));
+      dropZone.remove();
+      main();
+    } catch(ex) {
+      dropZone.innerHTML = ex.name + ": " + ex.message + "<br/>" + ex.stack;
+    }
   }
 }
 
