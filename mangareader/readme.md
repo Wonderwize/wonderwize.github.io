@@ -16,6 +16,7 @@ Key Code | Description
 <kbd>W</kbd> | Page sizing: fit to width
 <kbd>R</kbd> | Toggle Right-to-left mode
 <kbd>C</kbd> | Collapse spacing
+<kbd>N</kbd> | Hide navigation
 <kbd>M</kbd> | Toggle light/dark mode
 <kbd>D</kbd> | Double page view
 <kbd>F</kbd> | Toggle filler page
