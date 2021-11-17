@@ -6,9 +6,12 @@
     <link rel="stylesheet" type="text/css" href="styles.css" />
   </head>
   <body>
-    <div id="drop-zone" ondrop="handleDrop(event);" ondragover="allowDrop(event);">
-      <p>Drag and drop a manga archive...<br/>
-      Supported archive formats: cbz, cbr, cb7, zip, rar, 7z<p>
+    <div id="drop-zone" ondrop="handleFile(event);" ondragover="allowDrop(event);">
+      <p>Drag and drop or select a manga archive to start...<br/>
+      Supported archive formats: cbz, cbr, cb7, zip, rar, 7z</p>
+      <input type="file" id="fileup" onchange="handleFile(event);"
+       accept=".cbz,.cbr,.cb7,.zip,.rar,.7z" />
+      <label for="fileup" class="file-label">Select File</label>
     </div>
 
     <div id="manga-pages"></div>

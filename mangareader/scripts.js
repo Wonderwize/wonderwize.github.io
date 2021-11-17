@@ -34,9 +34,8 @@ const pageTemplate = (id, imgsrc) => `
 </div>`;
 
 /**
- * UTILITY FUNTIONS
+ * UTILITY FUNCTIONS
  */
-
 function htmlToElement(html) {
   var template = document.createElement('template');
   html = html.trim(); // Never return a text node of whitespace as the result
@@ -116,6 +115,7 @@ const darkModeCheckbox = document.getElementById('input-dark-mode');
 const doubleCheckbox = document.getElementById('input-double');
 const fillerCheckbox = document.getElementById('input-filler');
 
+const mangaPages = document.getElementById("manga-pages");
 const scrubberContainerDiv = document.getElementById('scrubber-container');
 const scrubberDiv = document.getElementById('scrubber');
 const scrubberPreviewDiv = document.getElementById('scrubber-preview');
@@ -186,103 +186,46 @@ function getHeight() {
 }
 
 function handleOriginalSize() {
-  setImagesWidth(screenClamp.none, getWidth());
+  setImageDimensions(screenClamp.none, getWidth());
 }
 
 function handleShrinkSize() {
-  setImagesDimensions(screenClamp.shrink, getWidth(), getHeight());
+  setImageDimensions(screenClamp.shrink, getWidth(), getHeight());
 }
 
 function handleFitWidth() {
-  setImagesWidth(screenClamp.fit, getWidth());
+  setImageDimensions(screenClamp.fit, getWidth());
 }
 
 function handleFitHeight() {
-  setImagesHeight(screenClamp.fit, getHeight());
+  setImageDimensions(screenClamp.fit, null, getHeight());
 }
 
 function handleShrinkWidth() {
-  setImagesWidth(screenClamp.shrink, getWidth());
+  setImageDimensions(screenClamp.shrink, getWidth());
 }
 
 function handleShrinkHeight() {
-  setImagesHeight(screenClamp.shrink, getHeight());
+  setImageDimensions(screenClamp.shrink, null, getHeight());
 }
 
-function setImagesWidth(fitMode, width) {
+function setImageDimensions(fitMode, width=null, height=null) {
   for (const img of images) {
     switch (fitMode) {
       case screenClamp.fit:
         Object.assign(img.style, {
-          width: `${width}px`,
+          width: width?`${width}px`:null,
           maxWidth: null,
-          height: null,
+          height: height?`${height}px`:null,
           maxHeight: null,
         });
         break;
       case screenClamp.shrink:
         Object.assign(img.style, {
           width: null,
-          maxWidth: `${width}px`,
+          maxWidth: width?`${width}px`:null,
           height: null,
-          maxHeight: null,
-        });
-        break;
-      default:
-        Object.assign(img.style, {
-          width: null,
-          maxWidth: null,
-          height: null,
-          maxHeight: null,
-        });
-    }
-  }
-  visiblePage.scrollIntoView();
-}
-
-function setImagesHeight(fitMode, height) {
-  for (const img of images) {
-    switch (fitMode) {
-      case screenClamp.fit:
-        Object.assign(img.style, {
-          height: `${height}px`,
-          maxWidth: null,
-          width: null,
-          maxHeight: null,
-        });
-        break;
-      case screenClamp.shrink:
-        Object.assign(img.style, {
-          width: null,
-          maxHeight: `${height}px`,
-          height: null,
-          maxWidth: null,
-        });
-        break;
-      default:
-        Object.assign(img.style, {
-          width: null,
-          maxWidth: null,
-          height: null,
-          maxHeight: null,
-        });
-    }
-  }
-  visiblePage.scrollIntoView();
-}
-
-function setImagesDimensions(fitMode, width, height) {
-  for (const img of images) {
-    switch (fitMode) {
-      case screenClamp.fit:
-        // Not implemented
-        break;
-      case screenClamp.shrink:
-        Object.assign(img.style, {
-          width: null,
-          maxHeight: `${height}px`,
-          height: null,
-          maxWidth: `${width}px`,
+          maxHeight: height?`${height}px`:null,
         });
         break;
       default:
@@ -310,8 +253,8 @@ function handleCheckbox(event, funAdd, funRem, cfg, scrollIntoView = false) {
 function handleRtl(event) {
   handleCheckbox(
     event,
-    () => document.getElementById("manga-pages").classList.add('rtl'),
-    () => document.getElementById("manga-pages").classList.remove('rtl'),
+    () => mangaPages.classList.add('rtl'),
+    () => mangaPages.classList.remove('rtl'),
     "rtl",
     true
   );
@@ -348,8 +291,8 @@ function handleDarkMode(event) {
 function handleDouble(event) {
   handleCheckbox(
     event,
-    () => document.getElementById("manga-pages").classList.add('double-page-view'),
-    () => document.getElementById("manga-pages").classList.remove('double-page-view'),
+    () => mangaPages.classList.add('double-page-view'),
+    () => mangaPages.classList.remove('double-page-view'),
     "double",
     true
   );
@@ -360,8 +303,7 @@ function handleFiller(event) {
     event,
     () => {
       let page = pageTemplate(-1, "");
-      let mp = document.getElementById("manga-pages");
-      mp.insertBefore(htmlToElement(page), mp.firstChild);
+      mangaPages.insertBefore(htmlToElement(page), mangaPages.firstChild);
     },
     () => document.getElementById("_-1").remove(),
     "filler"
@@ -397,10 +339,9 @@ function setupListeners() {
 }
 
 function nav(target) {
-  if(target >= 0 && target < pages.length) {
-    document.getElementById("_"+target).scrollIntoView({behavior: 'smooth'});
-    history.pushState(null, null, "#_"+target);
-  }
+  target = Math.min(Math.max(target, 0), pages.length);
+  document.getElementById("_"+target).scrollIntoView({behavior: 'smooth'});
+  history.pushState(null, null, "#_"+target);
 }
 
 function keyPressed(e) {
@@ -548,36 +489,41 @@ function allowDrop(ev){
   ev.preventDefault();
 }
 
-async function handleDrop(ev) {
+async function handleFile(ev) {
   ev.preventDefault();
 
-  if (ev.dataTransfer.items) {
-    if (ev.dataTransfer.items[0].kind === 'file') {
-      var file = ev.dataTransfer.items[0].getAsFile();
+  var file;
+  if(ev.target.files)
+    file = ev.target.files[0];
+  else if (ev.dataTransfer.items) {
+    if (ev.dataTransfer.items[0].kind === 'file')
+      file = ev.dataTransfer.items[0].getAsFile();
+  }
 
-      const module = await import(`./libarchive.js/main.js`);
-      module.Archive.init({
-        workerUrl: './libarchive.js/dist/worker-bundle.js'
-      });
+  if(file) {
+    const module = await import(`./libarchive.js/main.js`);
+    module.Archive.init({
+      workerUrl: './libarchive.js/dist/worker-bundle.js'
+    });
 
-      const archive = await module.Archive.open(file);
-      let i = 0;
-      await archive.extractFiles((entry) => {
-        if(entry.file.name.match(/.(jpg|jpeg|png|gif|bmp|svg|webp)$/i)) {
-          let page = pageTemplate(i, URL.createObjectURL(entry.file));
-          document.getElementById("manga-pages").appendChild(htmlToElement(page));
-          i = i+1;
-        }
-      });
+    const archive = await module.Archive.open(file);
+    await archive.extractFiles();
+    let files = await archive.getFilesArray();
+    //sort, since the archive might not be ordered correctly
+    files.sort((a,b) => a.file.name.localeCompare(b.file.name));
 
-      //without this the last page isn't picked up, can you imagine?
-      await new Promise(r => setTimeout(r, 50));
-      document.querySelector("a[href='#_"+i+"']").href = "#_none";
-      pages = Array.from(document.getElementsByClassName('page'));
-      images = Array.from(document.getElementsByClassName('image'));
-      document.getElementById("drop-zone").remove();
-      main();
-    }
+    files.forEach((entry, index) => {
+      if(entry.file.name.match(/.(jpg|jpeg|png|gif|bmp|svg|webp)$/i)) {
+        let page = pageTemplate(index, URL.createObjectURL(entry.file));
+        mangaPages.appendChild(htmlToElement(page));
+      }
+    });
+
+    document.querySelector("a[href='#_"+files.length+"']").href = "#_none";
+    pages = Array.from(document.getElementsByClassName('page'));
+    images = Array.from(document.getElementsByClassName('image'));
+    document.getElementById("drop-zone").remove();
+    main();
   }
 }
 

@@ -225,6 +225,7 @@ a[href='#_none'], a[href*='#_-'], .hide-nav a[href*='#_'] {
 #drop-zone {
   z-index: 500;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: fixed;
@@ -236,6 +237,20 @@ a[href='#_none'], a[href*='#_-'], .hide-nav a[href*='#_'] {
   color: #fff;
   background-color: rgba(38,40,41,.8);
   text-align: center;
+}
+
+.file-label {
+  width: 360px;
+  background-color: rgba(38,40,41,.8);
+  border-radius: 6px;
+  color: #fff;
+  padding: 10px 0;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+input[type="file"] {
+  display: none;
 }
 
 .toolbar {
