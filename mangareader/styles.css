@@ -167,7 +167,7 @@ input {
   border: none;
 }
 
-a[href='#_none'], a[href*='#_-'] {
+a[href='#_none'], a[href*='#_-'], .hide-nav a[href*='#_'] {
   display: none;
 }
 
@@ -255,7 +255,7 @@ a[href='#_none'], a[href*='#_-'] {
 
   /* Note: this is the exact height of the menu. Must be explicitly set in order to animate
   height transition */
-  height: 597px;
+  height: 638px;
 }
 
 .toolbar .menu-icon {

@@ -6,6 +6,7 @@ const storageKey = 'mangareader-config';
 const defaultConfig = {
   rtl: true,
   seamless: true,
+  hideNav: false,
   darkMode: true,
   double: false,
   filler: false,
@@ -110,6 +111,7 @@ const fitHeightBtn = document.getElementById('btn-fit-height');
 
 const rtlCheckbox = document.getElementById('input-rtl');
 const seamlessCheckbox = document.getElementById('input-seamless');
+const hideNavCheckbox = document.getElementById('input-hide-nav');
 const darkModeCheckbox = document.getElementById('input-dark-mode');
 const doubleCheckbox = document.getElementById('input-double');
 const fillerCheckbox = document.getElementById('input-filler');
@@ -149,9 +151,9 @@ function readConfig() {
   return config ? JSON.parse(config) : defaultConfig;
 }
 
-function writeConfig(config) {
-  const oldConfig = readConfig();
-  const newConfig = Object.assign({}, oldConfig, config);
+function writeConfig(key, val) {
+  let newConfig = readConfig();
+  newConfig[key] = val;
   try {
     localStorage.setItem(storageKey, JSON.stringify(newConfig));
   } catch (err) {
@@ -163,6 +165,7 @@ function loadSettings() {
   const config = readConfig();
   setupCheckbox(rtlCheckbox, config.rtl);
   setupCheckbox(seamlessCheckbox, config.seamless);
+  setupCheckbox(hideNavCheckbox, config.hideNav);
   setupCheckbox(darkModeCheckbox, config.darkMode);
   setupCheckbox(doubleCheckbox, config.double);
   setupCheckbox(fillerCheckbox, config.filler);
@@ -294,71 +297,75 @@ function setImagesDimensions(fitMode, width, height) {
   visiblePage.scrollIntoView();
 }
 
+function handleCheckbox(event, funAdd, funRem, cfg, scrollIntoView = false) {
+  const checked = event.target.checked;
+  if(checked)
+    funAdd();
+  else
+    funRem();
+  writeConfig(cfg, checked);
+  if(scrollIntoView && visiblePage) visiblePage.scrollIntoView();
+}
+
 function handleRtl(event) {
-  const rtlEnabled = event.target.checked;
-  const mp = document.getElementById("manga-pages");
-  if (rtlEnabled) {
-    mp.classList.add('rtl');
-  } else {
-    mp.classList.remove('rtl');
-  }
-  writeConfig({
-    rtl: rtlEnabled,
-  });
-  if (visiblePage) visiblePage.scrollIntoView();
+  handleCheckbox(
+    event,
+    () => document.getElementById("manga-pages").classList.add('rtl'),
+    () => document.getElementById("manga-pages").classList.remove('rtl'),
+    "rtl",
+    true
+  );
 }
 
 function handleSeamless(event) {
-  const seamlessEnabled = event.target.checked;
-  if (seamlessEnabled) {
-    document.body.classList.add('seamless');
-  } else {
-    document.body.classList.remove('seamless');
-  }
-  writeConfig({
-    seamless: seamlessEnabled,
-  });
-  if (visiblePage) visiblePage.scrollIntoView();
+  handleCheckbox(
+    event,
+    () => document.body.classList.add('seamless'),
+    () => document.body.classList.remove('seamless'),
+    "seamless",
+    true
+  );
+}
+
+function handleHideNav(event) {
+  handleCheckbox(
+    event,
+    () => document.body.classList.add('hide-nav'),
+    () => document.body.classList.remove('hide-nav'),
+    "hideNav"
+  );
 }
 
 function handleDarkMode(event) {
-  const darkModeEnabled = event.target.checked;
-  if (darkModeEnabled) {
-    document.body.classList.add('dark');
-  } else {
-    document.body.classList.remove('dark');
-  }
-  writeConfig({
-    darkMode: darkModeEnabled,
-  });
+  handleCheckbox(
+    event,
+    () => document.body.classList.add('dark'),
+    () => document.body.classList.remove('dark'),
+    "darkMode"
+  );
 }
 
 function handleDouble(event) {
-  const doubleEnabled = event.target.checked;
-  const mp = document.getElementById("manga-pages");
-  if (doubleEnabled) {
-    mp.classList.add('double-page-view');
-  } else {
-    mp.classList.remove('double-page-view');
-  }
-  writeConfig({
-    double: doubleEnabled,
-  });
-  if (visiblePage) visiblePage.scrollIntoView();
+  handleCheckbox(
+    event,
+    () => document.getElementById("manga-pages").classList.add('double-page-view'),
+    () => document.getElementById("manga-pages").classList.remove('double-page-view'),
+    "double",
+    true
+  );
 }
 
 function handleFiller(event) {
-  const fillerEnabled = event.target.checked;
-  if (fillerEnabled) {
-    let page = pageTemplate(-1, "");
-    let mp = document.getElementById("manga-pages");
-    mp.insertBefore(htmlToElement(page), mp.firstChild);
-  } else {
-    document.getElementById("_-1").remove();
-  }
-  writeConfig({
-    filler: fillerEnabled,
-  });
+  handleCheckbox(
+    event,
+    () => {
+      let page = pageTemplate(-1, "");
+      let mp = document.getElementById("manga-pages");
+      mp.insertBefore(htmlToElement(page), mp.firstChild);
+    },
+    () => document.getElementById("_-1").remove(),
+    "filler"
+  );
 }
 
 function setupListeners() {
@@ -371,6 +378,7 @@ function setupListeners() {
 
   rtlCheckbox.addEventListener('change', handleRtl);
   seamlessCheckbox.addEventListener('change', handleSeamless);
+  hideNavCheckbox.addEventListener('change', handleHideNav);
   darkModeCheckbox.addEventListener('change', handleDarkMode);
   doubleCheckbox.addEventListener('change', handleDouble);
   fillerCheckbox.addEventListener('change', handleFiller);
@@ -424,6 +432,9 @@ function keyPressed(e) {
       break;
     case 77: //M
       toggleCheckbox(darkModeCheckbox, true);
+      break;
+    case 78: //N
+      toggleCheckbox(hideNavCheckbox, true);
       break;
     case 82: //R
       toggleCheckbox(rtlCheckbox, true);
