@@ -4,8 +4,9 @@
 const storageKey = 'mangareader-config';
 
 const defaultConfig = {
-  darkMode: true,
+  rtl: true,
   seamless: true,
+  darkMode: true,
   double: false,
   filler: false,
 };
@@ -107,8 +108,9 @@ const shrinkHeightBtn = document.getElementById('btn-shrink-height');
 const fitWidthBtn = document.getElementById('btn-fit-width');
 const fitHeightBtn = document.getElementById('btn-fit-height');
 
-const darkModeCheckbox = document.getElementById('input-dark-mode');
+const rtlCheckbox = document.getElementById('input-rtl');
 const seamlessCheckbox = document.getElementById('input-seamless');
+const darkModeCheckbox = document.getElementById('input-dark-mode');
 const doubleCheckbox = document.getElementById('input-double');
 const fillerCheckbox = document.getElementById('input-filler');
 
@@ -159,39 +161,17 @@ function writeConfig(config) {
 
 function loadSettings() {
   const config = readConfig();
-  setupDarkMode(config);
-  setupSeamless(config);
-  setupDouble(config);
-  setupFiller(config);
+  setupCheckbox(rtlCheckbox, config.rtl);
+  setupCheckbox(seamlessCheckbox, config.seamless);
+  setupCheckbox(darkModeCheckbox, config.darkMode);
+  setupCheckbox(doubleCheckbox, config.double);
+  setupCheckbox(fillerCheckbox, config.filler);
 }
 
-function setupDarkMode(config) {
-  darkModeCheckbox.checked = config.darkMode;
-  // Setting `checked` does not fire the `change` event, so we must dispatch it manually
-  if (config.darkMode) {
-    toggleCheckbox(darkModeCheckbox);
-  }
-}
-
-function setupSeamless(config) {
-  seamlessCheckbox.checked = config.seamless;
-  if (config.seamless) {
-    toggleCheckbox(seamlessCheckbox);
-  }
-}
-
-function setupDouble(config) {
-  doubleCheckbox.checked = config.double;
-  if (config.double) {
-    toggleCheckbox(doubleCheckbox);
-  }
-}
-
-function setupFiller(config) {
-  fillerCheckbox.checked = config.filler;
-  if (config.filler) {
-    toggleCheckbox(fillerCheckbox);
-  }
+// Setting checked does not fire the change event, we must dispatch it manually
+function setupCheckbox(chk, cfg) {
+  chk.checked = cfg;
+  if (cfg) toggleCheckbox(chk);
 }
 
 function getWidth() {
@@ -314,16 +294,18 @@ function setImagesDimensions(fitMode, width, height) {
   visiblePage.scrollIntoView();
 }
 
-function handleDarkMode(event) {
-  const darkModeEnabled = event.target.checked;
-  if (darkModeEnabled) {
-    document.body.classList.add('dark');
+function handleRtl(event) {
+  const rtlEnabled = event.target.checked;
+  const mp = document.getElementById("manga-pages");
+  if (rtlEnabled) {
+    mp.classList.add('rtl');
   } else {
-    document.body.classList.remove('dark');
+    mp.classList.remove('rtl');
   }
   writeConfig({
-    darkMode: darkModeEnabled,
+    rtl: rtlEnabled,
   });
+  if (visiblePage) visiblePage.scrollIntoView();
 }
 
 function handleSeamless(event) {
@@ -337,6 +319,18 @@ function handleSeamless(event) {
     seamless: seamlessEnabled,
   });
   if (visiblePage) visiblePage.scrollIntoView();
+}
+
+function handleDarkMode(event) {
+  const darkModeEnabled = event.target.checked;
+  if (darkModeEnabled) {
+    document.body.classList.add('dark');
+  } else {
+    document.body.classList.remove('dark');
+  }
+  writeConfig({
+    darkMode: darkModeEnabled,
+  });
 }
 
 function handleDouble(event) {
@@ -375,8 +369,9 @@ function setupListeners() {
   fitWidthBtn.addEventListener('click', handleFitWidth);
   fitHeightBtn.addEventListener('click', handleFitHeight);
 
-  darkModeCheckbox.addEventListener('change', handleDarkMode);
+  rtlCheckbox.addEventListener('change', handleRtl);
   seamlessCheckbox.addEventListener('change', handleSeamless);
+  darkModeCheckbox.addEventListener('change', handleDarkMode);
   doubleCheckbox.addEventListener('change', handleDouble);
   fillerCheckbox.addEventListener('change', handleFiller);
 
@@ -407,12 +402,16 @@ function keyPressed(e) {
     case 39: //right
     case 75: //K
     case 76: //L
-      nav(parseInt(window.location.hash.substr(2))+1+(doubleCheckbox.checked?1:0));
+      nav(parseInt(window.location.hash.substr(2))+
+        ((rtlCheckbox.checked?-1:1)*
+        (1+(doubleCheckbox.checked?1:0))));
       break;
     case 37: //left
     case 72: //H
     case 74: //J
-      nav(parseInt(window.location.hash.substr(2))-1-(doubleCheckbox.checked?1:0));
+      nav(parseInt(window.location.hash.substr(2))+
+        ((rtlCheckbox.checked?-1:1)*
+        (-1-(doubleCheckbox.checked?1:0))));
       break;
     case 67: //C
       toggleCheckbox(seamlessCheckbox, true);
@@ -425,6 +424,9 @@ function keyPressed(e) {
       break;
     case 77: //M
       toggleCheckbox(darkModeCheckbox, true);
+      break;
+    case 82: //R
+      toggleCheckbox(rtlCheckbox, true);
       break;
     case 79: //O
       handleOriginalSize();
@@ -574,3 +576,6 @@ function main() {
   attachIntersectObservers();
   setupScrubber();
 }
+
+//clear hash on page refresh
+history.pushState("", document.title, window.location.pathname + window.location.search);

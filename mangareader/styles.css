@@ -65,21 +65,32 @@ body.seamless {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-auto-flow: dense;
+}
+
+.double-page-view.rtl {
   direction: rtl;
 }
 
 .double-page-view .image {
-  max-width: 49.5vw;
+  max-width: 49vw;
   box-shadow: none;
   border-radius: 0;
   border: none;
 }
 
 .double-page-view .page:nth-child(odd)  .image {
+  float: right;
+}
+
+.double-page-view.rtl .page:nth-child(odd)  .image {
   float: left;
 }
 
 .double-page-view .page:nth-child(even) .image {
+  float: left;
+}
+
+.double-page-view.rtl .page:nth-child(even) .image {
   float: right;
 }
 
@@ -90,17 +101,47 @@ body.seamless {
 }
 
 .double-page-view .page:nth-child(even) .next {
-  left: 100%;
-  right: -100%;
+  left: 0;
+}
+
+.double-page-view.rtl .page:nth-child(even) .next {
+  right: 0;
 }
 
 .double-page-view .page:nth-child(odd) .prev {
-  right: 100%;
-  left: -100%;
+  right: 0;
 }
 
-.double-page-view .arrow {
+.double-page-view.rtl .page:nth-child(odd) .prev {
+  left: 0;
+}
+
+.rtl .next {
+  left: -50%;
+  right: 50%;
+}
+
+.rtl .prev {
+  left: -50%;
+  right: 0;
+}
+
+.rtl .right {
+  left: 0;
+  right: auto;
+}
+
+.rtl .left {
+  right: 0;
+  left: auto;
+}
+
+.rtl .arrow {
   transform: scaleX(-1);
+}
+
+.double-page-view.rtl .arrow {
+  transform: none;
 }
 
 /* Override user agent stylesheet */
@@ -138,6 +179,7 @@ a[href='#_none'], a[href*='#_-'] {
   z-index: 1;
   opacity: 0;
   transition: opacity 0.2s;
+  overflow: hidden;
 }
 
 .next:hover,
@@ -213,7 +255,7 @@ a[href='#_none'], a[href*='#_-'] {
 
   /* Note: this is the exact height of the menu. Must be explicitly set in order to animate
   height transition */
-  height: 556px;
+  height: 597px;
 }
 
 .toolbar .menu-icon {
