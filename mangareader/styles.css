@@ -29,6 +29,7 @@ body {
   --toggle-nib-color-checked: #848484;
   --menu-subtitle-color: #808080;
   --menu-icon: url('menu.svg');
+  --menu-github: url('github.svg');
   --page-vertical-margin: 50px;
   --scrubber-background-rgb: 0, 0, 0;
   --scrubber-background-opacity: 0.6;
@@ -52,6 +53,7 @@ body.dark {
   --toggle-nib-color-checked: #4a4a4a;
   --menu-subtitle-color: #8c8c8c;
   --menu-icon: url('menu-light.svg');
+  --menu-github: url('github-light.svg');
   --scrubber-icon: url('scroll-light.svg');
 }
 
@@ -224,8 +226,22 @@ a[href='#_none'], a[href*='#_-'] {
   transition: opacity 0.2s;
 }
 
+.toolbar .menu-github {
+  background: var(--menu-github);
+  background-size: cover;
+  width: 32px;
+  height: 32px;
+  margin: 14px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
 .toolbar:hover .menu-icon {
   opacity: 0.5;
+}
+
+.toolbar:hover .menu-github {
+  opacity: 0.8;
 }
 
 .menu-header {
