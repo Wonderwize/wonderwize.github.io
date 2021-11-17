@@ -394,7 +394,6 @@ function setupListeners() {
 }
 
 function nav(target) {
-  console.log(target);
   if(target >= 0 && target < pages.length) {
     document.getElementById("_"+target).scrollIntoView({behavior: 'smooth'});
     history.pushState(null, null, "#_"+target);
