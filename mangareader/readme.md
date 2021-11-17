@@ -2,7 +2,8 @@
 
 ### [Try it](https://wonderwize.github.io/mangareader/)
 
-For offline usage you might need to change CORS policies. (`privacy.file_unique_origin` in firefox)
+For offline usage you might need to change CORS policies. (`privacy.file_unique_origin` in firefox)  
+When the pages are misaligned in double page view, the filler page can be toggled to shift all pages by one and fix the alignment. 
 
 Rework of [luejerry/html-mangareader](https://github.com/luejerry/html-mangareader).
 
