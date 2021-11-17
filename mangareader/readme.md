@@ -14,6 +14,7 @@ Key Code | Description
 <kbd>O</kbd> | Page sizing: original size
 <kbd>S</kbd> | Page sizing: shrink to fit
 <kbd>W</kbd> | Page sizing: fit to width
+<kbd>R</kbd> | Toggle Right-to-left mode
 <kbd>C</kbd> | Collapse spacing
 <kbd>M</kbd> | Toggle light/dark mode
 <kbd>D</kbd> | Double page view
