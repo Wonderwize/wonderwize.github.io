@@ -296,11 +296,14 @@ label {
   font-size: 14px;
 }
 
+.label-toggle:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
 .label-toggle {
   position: relative;
   cursor: pointer;
-  padding: 12px 24px 12px 36px;
-  margin-left: 24px;
+  padding: 12px 24px 12px 60px;
 }
 
 .label-toggle .input-toggle {
@@ -313,7 +316,7 @@ label {
   display: block;
   position: absolute;
   top: calc(50% - 6px);
-  left: 0;
+  left: 24px;
   width: 20px;
   height: 12px;
   background: var(--toggle-background-color);
@@ -331,7 +334,7 @@ label {
   display: block;
   position: absolute;
   top: calc(50% - 4px);
-  left: 2px;
+  left: 26px;
   background: var(--toggle-nib-color);
   width: 8px;
   height: 8px;
