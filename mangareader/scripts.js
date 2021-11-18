@@ -510,10 +510,18 @@ async function handleFile(ev) {
       });
 
       const archive = await module.Archive.open(file);
+      let hasEncryptedData = await archive.hasEncryptedData();
+      if(hasEncryptedData) {
+        var pw = prompt("Please enter the password for\r\n" + file.name);
+        await archive.usePassword(pw);
+      }
+
       await archive.extractFiles();
       let files = await archive.getFilesArray();
       //sort, since the archive might not be ordered correctly
-      files.sort((a,b) => a.file.name.localeCompare(b.file.name));
+      files.sort(
+        (a,b) => (a.path + a.file.name).localeCompare(b.path + b.file.name)
+      );
 
       files.forEach((entry, index) => {
         if(entry.file.name.match(/.(jpg|jpeg|png|gif|bmp|svg|webp)$/i)) {
@@ -527,6 +535,7 @@ async function handleFile(ev) {
       images = Array.from(document.getElementsByClassName('image'));
       dropZone.remove();
       main();
+      document.title = file.name;
     } catch(ex) {
       dropZone.innerHTML = ex.name + ": " + ex.message + "<br/>" + ex.stack;
     }
