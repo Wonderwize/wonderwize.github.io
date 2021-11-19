@@ -520,17 +520,19 @@ async function handleFile(ev) {
       let files = await archive.getFilesArray();
       //sort, since the archive might not be ordered correctly
       files.sort(
-        (a,b) => (a.path + a.file.name).localeCompare(b.path + b.file.name)
+        (a,b) => (a.path + a.file.name).localeCompare(b.path + b.file.name, 'en', {numeric: true})
       );
 
-      files.forEach((entry, index) => {
+      let i = 0;
+      files.forEach((entry) => {
         if(entry.file.name.match(/.(jpg|jpeg|png|gif|bmp|svg|webp)$/i)) {
-          let page = pageTemplate(index, URL.createObjectURL(entry.file));
+          let page = pageTemplate(i, URL.createObjectURL(entry.file));
           mangaPages.appendChild(htmlToElement(page));
+          i = i + 1;
         }
       });
 
-      document.querySelector("a[href='#_"+files.length+"']").href = "#_none";
+      document.querySelector("a[href='#_"+i+"']").href = "#_none";
       pages = Array.from(document.getElementsByClassName('page'));
       images = Array.from(document.getElementsByClassName('image'));
       dropZone.remove();
