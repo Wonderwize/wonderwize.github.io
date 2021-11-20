@@ -345,6 +345,18 @@ function nav(target) {
   history.pushState(null, null, "#_"+target);
 }
 
+function ocr() {
+  const target = images[parseInt(window.location.hash.substr(2))].src;
+
+  Tesseract.recognize(
+    target,
+    'jpn',
+    { logger: m => console.log(m) }
+  ).then(({ data: { text } }) => {
+    console.log(text);
+  })
+}
+
 function keyPressed(e) {
   var key = e.keyCode ? e.keyCode : e.which;
 
@@ -381,6 +393,9 @@ function keyPressed(e) {
     case 82: //R
       toggleCheckbox(rtlCheckbox, true);
       break;
+    case 84: //T
+      ocr();
+      break
     case 79: //O
       handleOriginalSize();
       break;
