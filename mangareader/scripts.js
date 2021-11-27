@@ -532,6 +532,7 @@ async function handleFile(ev) {
         }
       });
 
+      if(i == 0) throw new Error("Archive could not be extracted or no image data was found.");
       document.querySelector("a[href='#_"+i+"']").href = "#_none";
       pages = Array.from(document.getElementsByClassName('page'));
       images = Array.from(document.getElementsByClassName('image'));
