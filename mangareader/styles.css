@@ -30,7 +30,7 @@ body {
   --menu-subtitle-color: #808080;
   --menu-icon: url('menu.svg');
   --menu-github: url('github.svg');
-  --page-vertical-margin: 50px;
+  --page-vertical-margin: 10px;
   --scrubber-background-rgb: 0, 0, 0;
   --scrubber-background-opacity: 0.6;
   --active-scrubber-color: white;
