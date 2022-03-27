@@ -5,7 +5,7 @@ const storageKey = 'mangareader-config';
 
 const defaultConfig = {
   rtl: true,
-  seamless: true,
+  seamless: false,
   hideNav: false,
   darkMode: true,
   double: false,
@@ -525,7 +525,7 @@ async function handleFile(ev) {
 
       let i = 0;
       files.forEach((entry) => {
-        if(entry.file.name.match(/.(jpg|jpeg|png|gif|bmp|svg|webp)$/i)) {
+        if(entry.file.name.match(/.(jpg|jpeg|png|gif|bmp|svg|webp|avif)$/i)) {
           let page = pageTemplate(i, URL.createObjectURL(entry.file));
           mangaPages.appendChild(htmlToElement(page));
           i = i + 1;
@@ -543,6 +543,14 @@ async function handleFile(ev) {
       dropZone.innerHTML = ex.name + ": " + ex.message + "<br/>" + ex.stack;
     }
   }
+}
+
+async function handleUrl() {
+  var url = document.getElementById("url").value;
+  console.log(url);
+  fetch(url)
+  .then(response => response.json())
+  .then(data => console.log(data));
 }
 
 function main() {
