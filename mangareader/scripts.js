@@ -387,6 +387,9 @@ function keyPressed(e) {
     case 83: //S
       handleShrinkSize();
       break;
+    case 84: //T
+      handleFitHeight();
+      break
     case 87: //W
       handleFitWidth();
       break;
@@ -543,14 +546,6 @@ async function handleFile(ev) {
       dropZone.innerHTML = ex.name + ": " + ex.message + "<br/>" + ex.stack;
     }
   }
-}
-
-async function handleUrl() {
-  var url = document.getElementById("url").value;
-  console.log(url);
-  fetch(url)
-  .then(response => response.json())
-  .then(data => console.log(data));
 }
 
 function main() {
