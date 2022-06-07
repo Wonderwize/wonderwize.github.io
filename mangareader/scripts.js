@@ -493,10 +493,71 @@ function allowDrop(ev){
   ev.preventDefault();
 }
 
+async function getFileFromEntry(fileEntry) {
+  try {
+    return await new Promise((resolve, reject) => fileEntry.file(resolve, reject));
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function loadArchive(file) {
+  try {
+    const module = await import(`./libarchive.js/main.js`);
+    module.Archive.init({
+      workerUrl: './libarchive.js/dist/worker-bundle.js'
+    });
+
+    const archive = await module.Archive.open(file);
+    let hasEncryptedData = await archive.hasEncryptedData();
+    if(hasEncryptedData) {
+      var pw = prompt("Please enter the password for\r\n" + file.name);
+      await archive.usePassword(pw);
+    }
+
+    await archive.extractFiles();
+    return await archive.getFilesArray();
+  } catch(ex) {
+    dropZone.innerHTML = ex.name + ": " + ex.message + "<br/>" + ex.stack;
+  }
+}
+
+function sortAndPopulatePages(files) {
+  files.forEach((entry) => {
+    if(! entry.path) {
+      entry.path = entry.webkitRelativePath.replace(entry.name,"");
+    }
+  });
+
+  try {
+    files.sort(
+      (a,b) => (a.path + a.name).localeCompare(b.path + b.name, 'en', {numeric: true})
+    );
+
+    let i = 0;
+    files.forEach((entry) => {
+      if(entry.name.match(/.(jpg|jpeg|png|gif|bmp|svg|webp|avif)$/i)) {
+        let page = pageTemplate(i, URL.createObjectURL(entry));
+        mangaPages.appendChild(htmlToElement(page));
+        i = i + 1;
+      }
+    });
+
+    if(i == 0) throw new Error("Archive could not be extracted or no image data was found.");
+    document.querySelector("a[href='#_"+i+"']").href = "#_none";
+    pages = Array.from(document.getElementsByClassName('page'));
+    images = Array.from(document.getElementsByClassName('image'));
+  } catch(ex) {
+    dropZone.innerHTML = ex.name + ": " + ex.message + "<br/>" + ex.stack;
+  }
+}
+
 async function handleFile(ev) {
   ev.preventDefault();
 
   var file;
+  var files = [];
+
   if(ev.target.files)
     file = ev.target.files[0];
   else if (ev.dataTransfer.items) {
@@ -506,45 +567,43 @@ async function handleFile(ev) {
 
   if(file && file.name.match(/.(cbz|cbr|cb7|zip|rar|7z)$/i)) {
     dropZone.innerHTML = "Chotto a minute...";
-    try {
-      const module = await import(`./libarchive.js/main.js`);
-      module.Archive.init({
-        workerUrl: './libarchive.js/dist/worker-bundle.js'
-      });
+    var extracted_files = await loadArchive(file);
+    extracted_files.forEach(e => {
+      e.file.path = e.path;
+      files.push(e.file);
+    });
+  } else if(file) {
+      for( var j = 0; j < ev.dataTransfer.files.length; j++ ){
+        var ent = ev.dataTransfer.items[j];
+        if( ent.type ) { //single files
+            files.push( ent.getAsFile() );
+        } else {
+            try {
+                new FileReader().readAsBinaryString( ent.slice( 0, 5 ) );
+            } catch( ex ) { //directory
+              let directoryReader = ent.webkitGetAsEntry().createReader();
 
-      const archive = await module.Archive.open(file);
-      let hasEncryptedData = await archive.hasEncryptedData();
-      if(hasEncryptedData) {
-        var pw = prompt("Please enter the password for\r\n" + file.name);
-        await archive.usePassword(pw);
+              directoryReader.readEntries(async function(entries) {
+              Promise.all(entries.map(async (entry) => {
+                  return await getFileFromEntry(entry);
+                })).then(out => {
+                  sortAndPopulatePages(out);
+                  dropZone.remove();
+                  main();
+                  document.title = file.name;
+                  return;
+                });
+              });
+          }
       }
-
-      await archive.extractFiles();
-      let files = await archive.getFilesArray();
-      //sort, since the archive might not be ordered correctly
-      files.sort(
-        (a,b) => (a.path + a.file.name).localeCompare(b.path + b.file.name, 'en', {numeric: true})
-      );
-
-      let i = 0;
-      files.forEach((entry) => {
-        if(entry.file.name.match(/.(jpg|jpeg|png|gif|bmp|svg|webp|avif)$/i)) {
-          let page = pageTemplate(i, URL.createObjectURL(entry.file));
-          mangaPages.appendChild(htmlToElement(page));
-          i = i + 1;
-        }
-      });
-
-      if(i == 0) throw new Error("Archive could not be extracted or no image data was found.");
-      document.querySelector("a[href='#_"+i+"']").href = "#_none";
-      pages = Array.from(document.getElementsByClassName('page'));
-      images = Array.from(document.getElementsByClassName('image'));
-      dropZone.remove();
-      main();
-      document.title = file.name;
-    } catch(ex) {
-      dropZone.innerHTML = ex.name + ": " + ex.message + "<br/>" + ex.stack;
     }
+  }
+
+  if(files.length > 0) {
+    sortAndPopulatePages(files);
+    dropZone.remove();
+    main();
+    document.title = file.name;
   }
 }
 

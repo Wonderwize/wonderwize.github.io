@@ -2,16 +2,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Mangareader</title>
     <link rel="stylesheet" type="text/css" href="styles.css" />
   </head>
   <body>
     <div id="drop-zone" ondrop="handleFile(event);" ondragover="allowDrop(event);">
-      <p>Drag and drop or select a manga archive to start...<br/>
+      <p>Drag and drop or select a manga archive/folder to start...<br/>
       Supported archive formats: cbz, cbr, cb7, zip, rar, 7z</p>
       <input type="file" id="fileup" onchange="handleFile(event);"
        accept=".cbz,.cbr,.cb7,.zip,.rar,.7z" />
-      <label for="fileup" class="file-label">Select File</label>
+      <label for="fileup" class="file-label">Select archive</label>
     </div>
 
     <div id="manga-pages"></div>

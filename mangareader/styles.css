@@ -249,6 +249,24 @@ a[href='#_none'], a[href*='#_-'], .hide-nav a[href*='#_'] {
   cursor: pointer;
 }
 
+#url {
+  width: 325px;
+  background-color: rgba(38,40,41,.8);
+  border-radius: 6px;
+  color: #fff;
+  padding: 10px 0;
+}
+
+#submit {
+  width: 25px;
+  background-color: rgba(38,40,41,.8);
+  border-radius: 6px;
+  color: #fff;
+  padding: 10px 0;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
 input[type="file"] {
   display: none;
 }
