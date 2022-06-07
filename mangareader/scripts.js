@@ -519,6 +519,7 @@ async function loadArchive(file) {
     return await archive.getFilesArray();
   } catch(ex) {
     dropZone.innerHTML = ex.name + ": " + ex.message + "<br/>" + ex.stack;
+    throw new Error("");
   }
 }
 
@@ -549,6 +550,7 @@ function sortAndPopulatePages(files) {
     images = Array.from(document.getElementsByClassName('image'));
   } catch(ex) {
     dropZone.innerHTML = ex.name + ": " + ex.message + "<br/>" + ex.stack;
+    throw new Error("");
   }
 }
 
@@ -573,28 +575,28 @@ async function handleFile(ev) {
       files.push(e.file);
     });
   } else if(file) {
-      for( var j = 0; j < ev.dataTransfer.files.length; j++ ){
-        var ent = ev.dataTransfer.items[j];
-        if( ent.type ) { //single files
-            files.push( ent.getAsFile() );
-        } else {
-            try {
-                new FileReader().readAsBinaryString( ent.slice( 0, 5 ) );
-            } catch( ex ) { //directory
-              let directoryReader = ent.webkitGetAsEntry().createReader();
+    for( var j = 0; j < ev.dataTransfer.files.length; j++ ){
+      var ent = ev.dataTransfer.items[j];
+      if( ent.type ) { //single files
+          files.push( ent.getAsFile() );
+      } else {
+        try {
+          new FileReader().readAsBinaryString( ent.slice( 0, 5 ) );
+        } catch( ex ) { //directory
+          let directoryReader = ent.webkitGetAsEntry().createReader();
 
-              directoryReader.readEntries(async function(entries) {
-              Promise.all(entries.map(async (entry) => {
-                  return await getFileFromEntry(entry);
-                })).then(out => {
-                  sortAndPopulatePages(out);
-                  dropZone.remove();
-                  main();
-                  document.title = file.name;
-                  return;
-                });
-              });
-          }
+          directoryReader.readEntries(async function(entries) {
+            Promise.all(entries.map(async (entry) => {
+                return await getFileFromEntry(entry);
+            })).then(out => {
+              sortAndPopulatePages(out);
+              dropZone.remove();
+              main();
+              document.title = file.name;
+              return;
+            });
+          });
+        }
       }
     }
   }
