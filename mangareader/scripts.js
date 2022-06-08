@@ -496,8 +496,8 @@ function allowDrop(ev){
 async function getFileFromEntry(fileEntry) {
   try {
     return await new Promise((resolve, reject) => fileEntry.file(resolve, reject));
-  } catch (err) {
-    console.log(err);
+  } catch (ex) {
+    //ignore
   }
 }
 
@@ -524,13 +524,13 @@ async function loadArchive(file) {
 }
 
 function sortAndPopulatePages(files) {
-  files.forEach((entry) => {
-    if(! entry.path) {
-      entry.path = entry.webkitRelativePath.replace(entry.name,"");
-    }
-  });
-
   try {
+    files.forEach((entry) => {
+      if(! entry.path) {
+        entry.path = entry.webkitRelativePath.replace(entry.name,"");
+      }
+    });
+
     files.sort(
       (a,b) => (a.path + a.name).localeCompare(b.path + b.name, 'en', {numeric: true})
     );
@@ -587,9 +587,10 @@ async function handleFile(ev) {
 
           directoryReader.readEntries(async function(entries) {
             Promise.all(entries.map(async (entry) => {
+              if(!entry.isDirectory)
                 return await getFileFromEntry(entry);
             })).then(out => {
-              sortAndPopulatePages(out);
+              sortAndPopulatePages(out.filter(n => n));
               dropZone.remove();
               main();
               document.title = file.name;
