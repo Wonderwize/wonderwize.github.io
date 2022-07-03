@@ -312,7 +312,14 @@ function handleFiller(event) {
   );
 }
 
-function snapImage(x1,y1,x2,y2, e){
+function ocr(data) {
+  fetch('https://hf.space/embed/gryan-galario/manga-ocr-demo/+/api/predict/', { method: "POST", body: JSON.stringify({"data":[data]}), headers: { "Content-Type": "application/json" } }).then(function(response) { return response.json(); }).then(function(json_response){
+    console.log(json_response);
+    navigator.clipboard.writeText(json_response);
+  })
+}
+
+function snapImage(x1,y1,x2,y2, e) {
   html2canvas(document.body, {allowTaint:false, logging:false}).then(function(canvas) {
     // calc the size -- but no larger than the html2canvas size!
     var width = Math.min(canvas.width,Math.abs(x2-x1));
@@ -323,14 +330,11 @@ function snapImage(x1,y1,x2,y2, e){
     var avatarCanvas = document.createElement('canvas');
     avatarCanvas.width=width;
     avatarCanvas.height=height;
-    //avatarCanvas.id = 'avatarCanvas';
-    // put avatarCanvas into document body
-    //document.body.appendChild(avatarCanvas);
     // use the clipping version of drawImage to draw
     // a clipped portion of html2canvas's canvas onto avatarCanvas
     var avatarCtx = avatarCanvas.getContext('2d');
     avatarCtx.drawImage(canvas,x1,y1,width,height,0,0,width,height)
-    console.log(avatarCanvas.toDataURL("image/png"));
+    ocr(avatarCanvas.toDataURL("image/png"));
   });
 }
 
