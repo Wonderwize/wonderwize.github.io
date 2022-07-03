@@ -30,7 +30,7 @@ const pageTemplate = (id, imgsrc) => `
     <div class="arrow right">❯</div>
   </span>
 </a>
-<img src="${imgsrc}" class="image" />
+<img src="${imgsrc}" class="image" unselectable="on" ondragstart="return false" crossOrigin="anonymous" />
 </div>`;
 
 /**
@@ -123,6 +123,7 @@ const scrubberPreviewDiv = document.getElementById('scrubber-preview');
 const scrubberMarker = document.getElementById('scrubber-marker');
 const scrubberMarkerActive = document.getElementById('scrubber-marker-active');
 let scrubberImages; // Array of images, set in `setupScrubber()`
+let startX, startY;
 
 const animationDispatcher = createAnimationDispatcher();
 
@@ -311,6 +312,28 @@ function handleFiller(event) {
   );
 }
 
+function snapImage(x1,y1,x2,y2, e){
+  html2canvas(document.body, {allowTaint:false, logging:false}).then(function(canvas) {
+    // calc the size -- but no larger than the html2canvas size!
+    var width = Math.min(canvas.width,Math.abs(x2-x1));
+    var height = Math.min(canvas.height,Math.abs(y2-y1));
+    if(width < 5 || height < 5)
+      return;
+    // create a new avatarCanvas with the specified size
+    var avatarCanvas = document.createElement('canvas');
+    avatarCanvas.width=width;
+    avatarCanvas.height=height;
+    //avatarCanvas.id = 'avatarCanvas';
+    // put avatarCanvas into document body
+    //document.body.appendChild(avatarCanvas);
+    // use the clipping version of drawImage to draw
+    // a clipped portion of html2canvas's canvas onto avatarCanvas
+    var avatarCtx = avatarCanvas.getContext('2d');
+    avatarCtx.drawImage(canvas,x1,y1,width,height,0,0,width,height)
+    console.log(avatarCanvas.toDataURL("image/png"));
+  });
+}
+
 function setupListeners() {
   originalWidthBtn.addEventListener('click', handleOriginalSize);
   shrinkSizeBtn.addEventListener('click', handleShrinkSize);
@@ -325,6 +348,13 @@ function setupListeners() {
   darkModeCheckbox.addEventListener('change', handleDarkMode);
   doubleCheckbox.addEventListener('change', handleDouble);
   fillerCheckbox.addEventListener('change', handleFiller);
+  document.getElementsByTagName('body')[0].addEventListener('mousedown', function(event) {
+      startX = Math.floor(event.pageX);
+      startY = Math.floor(event.pageY);
+  });
+  document.getElementsByTagName('body')[0].addEventListener('mouseup', function(event) {
+    snapImage(Math.min(event.pageX, startX), Math.min(event.pageY, startY), Math.max(event.pageX, startX), Math.max(event.pageY, startY));
+  });
 
   window.onkeyup = function (e) { return keyPressed(e); };
 
