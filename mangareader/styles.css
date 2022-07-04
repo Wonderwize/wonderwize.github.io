@@ -80,8 +80,14 @@ body.dark .notify {
   background-color: #4a4a4a;
 }
 
-body.dark .notify__text, body.dark .notify__title {
+body.dark .notify__text, body.dark .notify__title,
+body.dark .notify__close {
   color: #fff;
+}
+
+.notify__close {
+  height: 22px !important;
+  width: 22px !important;
 }
 
 .hidden {
@@ -323,7 +329,7 @@ input[type="file"] {
 
   /* Note: this is the exact height of the menu. Must be explicitly set in order to animate
   height transition */
-  height: 638px;
+  height: 679px;
 }
 
 .toolbar .menu-icon {

@@ -10,6 +10,7 @@ const defaultConfig = {
   darkMode: true,
   double: false,
   filler: false,
+  autoCloseOCR: true,
 };
 
 const screenClamp = {
@@ -114,6 +115,8 @@ const hideNavCheckbox = document.getElementById('input-hide-nav');
 const darkModeCheckbox = document.getElementById('input-dark-mode');
 const doubleCheckbox = document.getElementById('input-double');
 const fillerCheckbox = document.getElementById('input-filler');
+const autoCloseOCRCheckbox = document.getElementById('input-autoclose');
+let notifyPopup;
 
 const dropZone = document.getElementById("drop-zone");
 const mangaPages = document.getElementById("manga-pages");
@@ -174,6 +177,7 @@ function loadSettings() {
   setupCheckbox(darkModeCheckbox, config.darkMode);
   setupCheckbox(doubleCheckbox, config.double);
   setupCheckbox(fillerCheckbox, config.filler);
+  setupCheckbox(autoCloseOCRCheckbox, config.autoCloseOCR);
 }
 
 // Setting checked does not fire the change event, we must dispatch it manually
@@ -315,19 +319,30 @@ function handleFiller(event) {
   );
 }
 
+function handleAutocloseOCR(event) {
+  handleCheckbox(
+    event,
+    () => {},
+    () => {},
+    "autoCloseOCR"
+  );
+}
+
 function ocr(data) {
+  if(notifyPopup) notifyPopup.close();
   fetch('https://hf.space/embed/gryan-galario/manga-ocr-demo/+/api/predict/', { method: "POST", body: JSON.stringify({"data":[data]}), headers: { "Content-Type": "application/json" } }).then(function(response) { return response.json(); }).then(function(json_response){
     let parsedData = json_response.data.toString();
     navigator.clipboard.writeText(parsedData);
-    new Notify ({
+    const config = readConfig();
+    notifyPopup = new Notify ({
       status: 'success',
       title: 'OCR Result Copied to Clipboard',
       text: "<img src='"+data+"' /><br/>"+parsedData,
       effect: 'fade',
       speed: 300,
       showIcon: false,
-      showCloseButton: false,
-      autoclose: true,
+      showCloseButton: !config.autoCloseOCR,
+      autoclose: config.autoCloseOCR,
       autotimeout: 3000,
       gap: 20,
       distance: 20,
@@ -353,7 +368,7 @@ function snapCanvas(canvas,x1,x2,y1,y2,offsetLeft,offsetTop) {
   var x = x1-window.scrollX+(window.scrollX-offsetLeft);
   var y = y1-window.scrollY+(window.scrollY-offsetTop);
 
-  avatarCtx.drawImage(canvas,x,y,width,height,0,0,width,height)
+  avatarCtx.drawImage(canvas,x-5,y,width+5,height,0,0,width+5,height)
   //document.body.appendChild(avatarCanvas);
   ocr(avatarCanvas.toDataURL("image/png"), avatarCanvas)
 }
@@ -375,8 +390,8 @@ function snapImage(x1,y1,x2,y2) {
 
   var bodyRect = document.body.getBoundingClientRect(),
     elemRect = target.getBoundingClientRect(),
-    offsetLeft   = elemRect.left - bodyRect.left,
-    offsetTop  = elemRect.top - bodyRect.top;
+    offsetLeft = elemRect.left - bodyRect.left,
+    offsetTop = elemRect.top - bodyRect.top;
 
   var div = document.createElement("div");
   div.appendChild(createImg(target));
@@ -403,6 +418,7 @@ function setupListeners() {
   darkModeCheckbox.addEventListener('change', handleDarkMode);
   doubleCheckbox.addEventListener('change', handleDouble);
   fillerCheckbox.addEventListener('change', handleFiller);
+  autoCloseOCRCheckbox.addEventListener('change', handleAutocloseOCR);
   document.body.addEventListener('mousedown', function(event) {
       startX = Math.floor(event.pageX);
       startY = Math.floor(event.pageY);
@@ -493,6 +509,9 @@ function keyPressed(e) {
     case 82: //R
       toggleCheckbox(rtlCheckbox, true);
       break;
+    case 80: //P
+      toggleCheckbox(autoCloseOCRCheckbox, true);
+      break;
     case 79: //O
       handleOriginalSize();
       break;
@@ -509,6 +528,7 @@ function keyPressed(e) {
       drag = false;
       var ctx = maimCanvas.getContext('2d');
       ctx.clearRect(0,0,canvas.width,canvas.height);
+      if(notifyPopup) notifyPopup.close();
     default:
       //console.log("Key event: " + key + " " + String.fromCharCode(key));
   }
