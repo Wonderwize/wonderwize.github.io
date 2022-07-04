@@ -7,6 +7,8 @@ When the pages are misaligned in double page view, a filler page can be toggled 
 
 Standalone web app rework of [luejerry/html-mangareader](https://github.com/luejerry/html-mangareader).
 
+OCR by [kha-white/manga-ocr](https://github.com/kha-white/manga-ocr) via this [API](https://hf.space/embed/gryan-galario/manga-ocr-demo/api).
+
 ## Keyboard Shortcuts
 
 Key Code | Description
@@ -22,3 +24,7 @@ Key Code | Description
 <kbd>F</kbd> | Toggle filler page
 <kbd>→</kbd>, <kbd>K</kbd>, <kbd>L</kbd> | Move to next page
 <kbd>←</kbd>, <kbd>H</kbd>, <kbd>J</kbd> | Move to previous page
+
+## Mouse Shortcuts
+
+Click and hold to draw a rectangular area with your mouse to OCR the text within. Will not work offline.
