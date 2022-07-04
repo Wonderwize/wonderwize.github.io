@@ -15,11 +15,12 @@ When the pages are misaligned in double page view, a filler page can be toggled 
 
 ## OCR
 
-Draw a rectangle with your mouse to OCR a region of the page.
-You can use Yomichan's clipboard monitor or grab the text from the popup window.
+Draw a rectangle with your mouse to OCR a region of the page.  
+You can use Yomichan's clipboard monitor or grab the text from the popup window.  
 
 https://user-images.githubusercontent.com/94489585/177156342-a26d6a4e-a171-4f72-ad89-0066a981c906.mp4
 
+Only accurate at 100% browser zoom level.  
 OCR by [kha-white/manga-ocr](https://github.com/kha-white/manga-ocr) via this [API](https://hf.space/embed/gryan-galario/manga-ocr-demo/api).
 
 ## Keyboard Shortcuts
