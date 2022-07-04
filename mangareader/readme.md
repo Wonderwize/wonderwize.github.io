@@ -16,6 +16,7 @@ Key Code | Description
 <kbd>O</kbd> | Page sizing: original size
 <kbd>S</kbd> | Page sizing: shrink to fit
 <kbd>W</kbd> | Page sizing: fit to width
+<kbd>T</kbd> | Page sizing: fit to height
 <kbd>R</kbd> | Toggle Right-to-left mode
 <kbd>C</kbd> | Collapse spacing
 <kbd>N</kbd> | Hide navigation
