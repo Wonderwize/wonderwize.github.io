@@ -23,7 +23,8 @@ Key Code | Description
 <kbd>M</kbd> | Toggle light/dark mode
 <kbd>D</kbd> | Double page view
 <kbd>F</kbd> | Toggle filler page
-<kbd>Esc</kbd> | Cancel OCR region
+<kbd>P</kbd> | Toggle OCR popup autoclose
+<kbd>Esc</kbd> | Cancel OCR region, close OCR window
 <kbd>→</kbd>, <kbd>K</kbd>, <kbd>L</kbd> | Move to next page
 <kbd>←</kbd>, <kbd>H</kbd>, <kbd>J</kbd> | Move to previous page
 
