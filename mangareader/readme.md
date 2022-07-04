@@ -2,10 +2,23 @@
 
 ### [Try it](https://wonderwize.github.io/mangareader/)
 
-For offline usage you might need to change CORS policies. (`privacy.file_unique_origin` in firefox)  
+https://user-images.githubusercontent.com/94489585/177158247-f2a8bc77-7720-425d-b883-da691cc50c1c.mp4
+
+Standalone web app rework of [luejerry/html-mangareader](https://github.com/luejerry/html-mangareader) with many new features.
+- Seamless double page view
+- Japanese OCR
+- Keyboard Shortcuts
+- Toggle between RTL and LTR reading modes
+
+For offline usage you might need to change your browser's CORS policies. (`privacy.file_unique_origin` in firefox)  
 When the pages are misaligned in double page view, a filler page can be toggled to shift all pages by one and fix the alignment. 
 
-Standalone web app rework of [luejerry/html-mangareader](https://github.com/luejerry/html-mangareader).
+## OCR
+
+Draw a rectangle with your mouse to OCR a region of the page.
+You can use Yomichan's clipboard monitor or grab the text from the popup window.
+
+https://user-images.githubusercontent.com/94489585/177156342-a26d6a4e-a171-4f72-ad89-0066a981c906.mp4
 
 OCR by [kha-white/manga-ocr](https://github.com/kha-white/manga-ocr) via this [API](https://hf.space/embed/gryan-galario/manga-ocr-demo/api).
 
