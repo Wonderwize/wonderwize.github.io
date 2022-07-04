@@ -376,8 +376,8 @@ function snapCanvas(canvas,x1,x2,y1,y2,offsetLeft,offsetTop) {
 function createImg(src) {
   var img = document.createElement("img");
   img.src = src.src;
-  img.width = src.width;
-  img.height = src.height;
+  img.width = src.width / window.devicePixelRatio;
+  img.height = src.height / window.devicePixelRatio;
   return img;
 }
 
