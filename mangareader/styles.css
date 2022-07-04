@@ -71,6 +71,11 @@ body.dark {
   pointer-events: none;
 }
 
+.notifications-container {
+  max-width: 98% !important;
+  width: auto !important;
+}
+
 body.dark .notify {
   background-color: #4a4a4a;
 }

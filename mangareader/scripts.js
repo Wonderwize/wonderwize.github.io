@@ -318,41 +318,77 @@ function handleFiller(event) {
 function ocr(data) {
   fetch('https://hf.space/embed/gryan-galario/manga-ocr-demo/+/api/predict/', { method: "POST", body: JSON.stringify({"data":[data]}), headers: { "Content-Type": "application/json" } }).then(function(response) { return response.json(); }).then(function(json_response){
     let parsedData = json_response.data.toString();
+    navigator.clipboard.writeText(parsedData);
     new Notify ({
       status: 'success',
       title: 'OCR Result Copied to Clipboard',
-      text: parsedData,
+      text: "<img src='"+data+"' /><br/>"+parsedData,
       effect: 'fade',
       speed: 300,
       showIcon: false,
       showCloseButton: false,
       autoclose: true,
-      autotimeout: 2000,
+      autotimeout: 3000,
       gap: 20,
       distance: 20,
       type: 1,
       position: 'right top'
     })
-    navigator.clipboard.writeText(parsedData);
   })
 }
 
+function snapCanvas(canvas,x1,x2,y1,y2,offsetLeft,offsetTop) {
+  // calc the size -- but no larger than the html2canvas size!
+  var width = Math.min(canvas.width,Math.abs(x2-x1));
+  var height = Math.min(canvas.height,Math.abs(y2-y1));
+  if(width < 5 || height < 5)
+    return;
+  // create a new avatarCanvas with the specified size
+  var avatarCanvas = document.createElement('canvas');
+  avatarCanvas.width=width;
+  avatarCanvas.height=height;
+  // use the clipping version of drawImage to draw
+  // a clipped portion of html2canvas's canvas onto avatarCanvas
+  var avatarCtx = avatarCanvas.getContext('2d');
+  var x = x1-window.scrollX+(window.scrollX-offsetLeft);
+  var y = y1-window.scrollY+(window.scrollY-offsetTop);
+
+  avatarCtx.drawImage(canvas,x,y,width,height,0,0,width,height)
+  //document.body.appendChild(avatarCanvas);
+  ocr(avatarCanvas.toDataURL("image/png"), avatarCanvas)
+}
+
+function createImg(src) {
+  var img = document.createElement("img");
+  img.src = src;
+  return img;
+}
+
 function snapImage(x1,y1,x2,y2, e) {
-  html2canvas(document.body, {allowTaint:false, logging:false}).then(function(canvas) {
-    // calc the size -- but no larger than the html2canvas size!
-    var width = Math.min(canvas.width,Math.abs(x2-x1));
-    var height = Math.min(canvas.height,Math.abs(y2-y1));
-    if(width < 5 || height < 5)
-      return;
-    // create a new avatarCanvas with the specified size
-    var avatarCanvas = document.createElement('canvas');
-    avatarCanvas.width=width;
-    avatarCanvas.height=height;
-    // use the clipping version of drawImage to draw
-    // a clipped portion of html2canvas's canvas onto avatarCanvas
-    var avatarCtx = avatarCanvas.getContext('2d');
-    avatarCtx.drawImage(canvas,x1,y1,width,height,0,0,width,height)
-    ocr(avatarCanvas.toDataURL("image/png"));
+  var target = document.elementFromPoint(x1-window.scrollX, y1-window.scrollY);
+  var second = document.elementFromPoint(x2-window.scrollX, y2-window.scrollY);
+
+  if(target.tagName != "IMG")
+    target = second;
+  var bodyRect = document.body.getBoundingClientRect(),
+    elemRect = target.getBoundingClientRect(),
+    offsetLeft   = elemRect.left - bodyRect.left,
+    offsetTop  = elemRect.top - bodyRect.top;
+
+  if(target != second) {
+    var div = document.createElement("div");
+    div.appendChild(createImg(target.src));
+    div.appendChild(createImg(second.src));
+    document.body.appendChild(div);
+
+    html2canvas(div, {allowTaint:false, logging:false}).then(function(canvas) {
+      snapCanvas(canvas,x1,x2,y1,y2,offsetLeft,offsetTop);
+      document.body.removeChild(div);
+    })
+  }
+  else
+  html2canvas(target, {allowTaint:false, logging:false}).then(function(canvas) {
+    snapCanvas(canvas,x1,x2,y1,y2,offsetLeft,offsetTop);
   });
 }
 
@@ -370,11 +406,11 @@ function setupListeners() {
   darkModeCheckbox.addEventListener('change', handleDarkMode);
   doubleCheckbox.addEventListener('change', handleDouble);
   fillerCheckbox.addEventListener('change', handleFiller);
-  document.getElementsByTagName('body')[0].addEventListener('mousedown', function(event) {
+  document.body.addEventListener('mousedown', function(event) {
       startX = Math.floor(event.pageX);
       startY = Math.floor(event.pageY);
   });
-  document.getElementsByTagName('body')[0].addEventListener('mouseup', function(event) {
+  document.body.addEventListener('mouseup', function(event) {
     snapImage(Math.min(event.pageX, startX), Math.min(event.pageY, startY), Math.max(event.pageX, startX), Math.max(event.pageY, startY));
     toolbarDiv.classList.remove("hidden");
     scrubberDiv.classList.remove("hidden");
@@ -382,7 +418,7 @@ function setupListeners() {
     var ctx = maimCanvas.getContext('2d');
     ctx.clearRect(0,0,canvas.width,canvas.height);
   });
-  document.getElementsByTagName('body')[0].addEventListener('dragstart',
+  document.body.addEventListener('dragstart',
   function(event) {
     toolbarDiv.classList.add("hidden");
     scrubberDiv.classList.add("hidden");
@@ -390,7 +426,7 @@ function setupListeners() {
     maimCanvas.width = document.documentElement.clientWidth;
     maimCanvas.height = document.documentElement.clientHeight;
   });
-  document.getElementsByTagName('body')[0].addEventListener('mousemove',
+  document.body.addEventListener('mousemove',
   function(e) {
     if(drag) {
       var ctx = maimCanvas.getContext('2d');
