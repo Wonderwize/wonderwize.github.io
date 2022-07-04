@@ -117,6 +117,7 @@ const fillerCheckbox = document.getElementById('input-filler');
 
 const dropZone = document.getElementById("drop-zone");
 const mangaPages = document.getElementById("manga-pages");
+const toolbarDiv = document.getElementById('toolbar');
 const scrubberContainerDiv = document.getElementById('scrubber-container');
 const scrubberDiv = document.getElementById('scrubber');
 const scrubberPreviewDiv = document.getElementById('scrubber-preview');
@@ -314,8 +315,22 @@ function handleFiller(event) {
 
 function ocr(data) {
   fetch('https://hf.space/embed/gryan-galario/manga-ocr-demo/+/api/predict/', { method: "POST", body: JSON.stringify({"data":[data]}), headers: { "Content-Type": "application/json" } }).then(function(response) { return response.json(); }).then(function(json_response){
-    console.log(json_response);
-    navigator.clipboard.writeText(json_response);
+    new Notify ({
+      status: 'success',
+      title: 'OCR Result Copied to Clipboard',
+      text: json_response.data,
+      effect: 'fade',
+      speed: 300,
+      showIcon: false,
+      showCloseButton: false,
+      autoclose: true,
+      autotimeout: 2000,
+      gap: 20,
+      distance: 20,
+      type: 1,
+      position: 'right top'
+    })
+    navigator.clipboard.writeText(json_response.data);
   })
 }
 
@@ -358,6 +373,13 @@ function setupListeners() {
   });
   document.getElementsByTagName('body')[0].addEventListener('mouseup', function(event) {
     snapImage(Math.min(event.pageX, startX), Math.min(event.pageY, startY), Math.max(event.pageX, startX), Math.max(event.pageY, startY));
+    toolbarDiv.classList.remove("hidden");
+    scrubberDiv.classList.remove("hidden");
+  });
+  document.getElementsByTagName('body')[0].addEventListener('dragstart',
+  function(event) {
+    toolbarDiv.classList.add("hidden");
+    scrubberDiv.classList.add("hidden");
   });
 
   window.onkeyup = function (e) { return keyPressed(e); };

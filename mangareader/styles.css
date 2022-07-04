@@ -57,6 +57,22 @@ body.dark {
   --scrubber-icon: url('scroll-light.svg');
 }
 
+body.dark .notify {
+  background-color: #4a4a4a;
+}
+
+body.dark .notify__text {
+  color: #fff;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.menu-icon {
+  visibility: visible !important;
+}
+
 body.seamless {
   --page-vertical-margin: 0;
 }
