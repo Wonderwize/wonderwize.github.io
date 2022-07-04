@@ -360,36 +360,33 @@ function snapCanvas(canvas,x1,x2,y1,y2,offsetLeft,offsetTop) {
 
 function createImg(src) {
   var img = document.createElement("img");
-  img.src = src;
+  img.src = src.src;
+  img.width = src.width;
+  img.height = src.height;
   return img;
 }
 
-function snapImage(x1,y1,x2,y2, e) {
+function snapImage(x1,y1,x2,y2) {
   var target = document.elementFromPoint(x1-window.scrollX, y1-window.scrollY);
   var second = document.elementFromPoint(x2-window.scrollX, y2-window.scrollY);
 
   if(target.tagName != "IMG")
     target = second;
+
   var bodyRect = document.body.getBoundingClientRect(),
     elemRect = target.getBoundingClientRect(),
     offsetLeft   = elemRect.left - bodyRect.left,
     offsetTop  = elemRect.top - bodyRect.top;
 
-  if(target != second) {
-    var div = document.createElement("div");
-    div.appendChild(createImg(target.src));
-    div.appendChild(createImg(second.src));
-    document.body.appendChild(div);
+  var div = document.createElement("div");
+  div.appendChild(createImg(target));
+  div.appendChild(createImg(second));
+  document.body.appendChild(div);
 
-    html2canvas(div, {allowTaint:false, logging:false}).then(function(canvas) {
-      snapCanvas(canvas,x1,x2,y1,y2,offsetLeft,offsetTop);
-      document.body.removeChild(div);
-    })
-  }
-  else
-  html2canvas(target, {allowTaint:false, logging:false}).then(function(canvas) {
+  html2canvas(div, {allowTaint:false, logging:false}).then(function(canvas) {
     snapCanvas(canvas,x1,x2,y1,y2,offsetLeft,offsetTop);
-  });
+    document.body.removeChild(div);
+  })
 }
 
 function setupListeners() {
@@ -411,6 +408,7 @@ function setupListeners() {
       startY = Math.floor(event.pageY);
   });
   document.body.addEventListener('mouseup', function(event) {
+    if(drag)
     snapImage(Math.min(event.pageX, startX), Math.min(event.pageY, startY), Math.max(event.pageX, startX), Math.max(event.pageY, startY));
     toolbarDiv.classList.remove("hidden");
     scrubberDiv.classList.remove("hidden");
@@ -507,6 +505,10 @@ function keyPressed(e) {
     case 87: //W
       handleFitWidth();
       break;
+    case 27: //Esc
+      drag = false;
+      var ctx = maimCanvas.getContext('2d');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
     default:
       //console.log("Key event: " + key + " " + String.fromCharCode(key));
   }
