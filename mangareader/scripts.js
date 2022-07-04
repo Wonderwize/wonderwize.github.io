@@ -315,10 +315,11 @@ function handleFiller(event) {
 
 function ocr(data) {
   fetch('https://hf.space/embed/gryan-galario/manga-ocr-demo/+/api/predict/', { method: "POST", body: JSON.stringify({"data":[data]}), headers: { "Content-Type": "application/json" } }).then(function(response) { return response.json(); }).then(function(json_response){
+    let parsedData = json_response.data.toString();
     new Notify ({
       status: 'success',
       title: 'OCR Result Copied to Clipboard',
-      text: json_response.data,
+      text: parsedData,
       effect: 'fade',
       speed: 300,
       showIcon: false,
@@ -330,7 +331,7 @@ function ocr(data) {
       type: 1,
       position: 'right top'
     })
-    navigator.clipboard.writeText(json_response.data);
+    navigator.clipboard.writeText(parsedData);
   })
 }
 
