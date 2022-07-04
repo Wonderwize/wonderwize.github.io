@@ -57,6 +57,20 @@ body.dark {
   --scrubber-icon: url('scroll-light.svg');
 }
 
+#canvasWrapper {
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#canvas {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
 body.dark .notify {
   background-color: #4a4a4a;
 }

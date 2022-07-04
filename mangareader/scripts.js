@@ -6,7 +6,7 @@ const storageKey = 'mangareader-config';
 const defaultConfig = {
   rtl: true,
   seamless: false,
-  hideNav: false,
+  hideNav: true,
   darkMode: true,
   double: false,
   filler: false,
@@ -123,6 +123,8 @@ const scrubberDiv = document.getElementById('scrubber');
 const scrubberPreviewDiv = document.getElementById('scrubber-preview');
 const scrubberMarker = document.getElementById('scrubber-marker');
 const scrubberMarkerActive = document.getElementById('scrubber-marker-active');
+const maimCanvas = document.getElementById("canvas");
+let drag = false;
 let scrubberImages; // Array of images, set in `setupScrubber()`
 let startX, startY;
 
@@ -376,11 +378,30 @@ function setupListeners() {
     snapImage(Math.min(event.pageX, startX), Math.min(event.pageY, startY), Math.max(event.pageX, startX), Math.max(event.pageY, startY));
     toolbarDiv.classList.remove("hidden");
     scrubberDiv.classList.remove("hidden");
+    drag = false;
+    var ctx = maimCanvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
   });
   document.getElementsByTagName('body')[0].addEventListener('dragstart',
   function(event) {
     toolbarDiv.classList.add("hidden");
     scrubberDiv.classList.add("hidden");
+    drag = true;
+    maimCanvas.width = document.documentElement.clientWidth;
+    maimCanvas.height = document.documentElement.clientHeight;
+  });
+  document.getElementsByTagName('body')[0].addEventListener('mousemove',
+  function(e) {
+    if(drag) {
+      var ctx = maimCanvas.getContext('2d');
+      let w = (e.pageX- window.scrollX) - (startX - window.scrollX);
+      let h = (e.pageY- window.scrollY) - (startY - window.scrollY);
+
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.setLineDash([6]);
+      ctx.strokeStyle = "#FF0000";
+      ctx.strokeRect(startX-window.scrollX, startY - window.scrollY, w, h);
+    }
   });
 
   window.onkeyup = function (e) { return keyPressed(e); };
