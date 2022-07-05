@@ -476,6 +476,10 @@ function nav(target) {
 function keyPressed(e) {
   var key = e.keyCode ? e.keyCode : e.which;
 
+  //to allow ctrl+c
+  if(e.ctrlKey || e.altKey || e.metaKey || e.shiftKey)
+    return;
+
   switch (key) {
     case 39: //right
     case 75: //K
@@ -529,6 +533,10 @@ function keyPressed(e) {
       var ctx = maimCanvas.getContext('2d');
       ctx.clearRect(0,0,canvas.width,canvas.height);
       if(notifyPopup) notifyPopup.close();
+      break;
+    case 190: //.
+      document.documentElement.classList.toggle("hide-scrollbar");
+      break;
     default:
       //console.log("Key event: " + key + " " + String.fromCharCode(key));
   }

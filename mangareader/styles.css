@@ -16,7 +16,20 @@
     U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-html { font-size: calc(0.625vmin + 0.75rem) }
+html {
+  font-size: calc(0.625vmin + 0.75rem);
+}
+
+.hide-scrollbar { /* put on html element*/
+    /* Hide scrollbar for IE, Edge and Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 
 body {
   --body-bg-color: #f0f0f0;
