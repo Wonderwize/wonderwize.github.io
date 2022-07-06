@@ -44,3 +44,9 @@ Key Code | Description
 ## Mouse Shortcuts
 
 Click and hold to draw a rectangular area with your mouse to OCR the text within. Will not work offline.
+
+# Libraries
+
+- [libarchivejs](https://github.com/nika-begiashvili/libarchivejs)
+- [html2canvas](https://github.com/niklasvh/html2canvas)
+- [simple-notify](https://github.com/simple-notify/simple-notify)
