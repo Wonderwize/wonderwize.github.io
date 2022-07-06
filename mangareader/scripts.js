@@ -328,20 +328,23 @@ function handleAutocloseOCR(event) {
   );
 }
 
-function ocr(data) {
+function closeOCRWindow() {
   if(notifyPopup) notifyPopup.close();
+}
+
+function ocr(data) {
+  closeOCRWindow();
   fetch('https://hf.space/embed/gryan-galario/manga-ocr-demo/+/api/predict/', { method: "POST", body: JSON.stringify({"data":[data]}), headers: { "Content-Type": "application/json" } }).then(function(response) { return response.json(); }).then(function(json_response){
     let parsedData = json_response.data.toString();
     navigator.clipboard.writeText(parsedData);
     const config = readConfig();
     notifyPopup = new Notify ({
       status: 'success',
-      title: 'OCR Result Copied to Clipboard',
-      text: "<img src='"+data+"' /><br/>"+parsedData,
+      text: `<p><img src="`+data+`" style="cursor: pointer;" onClick="closeOCRWindow();" title="Close popup window" /></p><p>`+parsedData+`</p>`,
       effect: 'fade',
       speed: 300,
       showIcon: false,
-      showCloseButton: !config.autoCloseOCR,
+      showCloseButton: false,
       autoclose: config.autoCloseOCR,
       autotimeout: 3000,
       gap: 20,
@@ -368,9 +371,9 @@ function snapCanvas(canvas,x1,x2,y1,y2,offsetLeft,offsetTop) {
   var x = x1-window.scrollX+(window.scrollX-offsetLeft);
   var y = y1-window.scrollY+(window.scrollY-offsetTop);
 
-  avatarCtx.drawImage(canvas,x-5,y,width+5,height,0,0,width+5,height)
+  avatarCtx.drawImage(canvas,x-5,y,width+5,height,0,0,width+5,height);
   //document.body.appendChild(avatarCanvas);
-  ocr(avatarCanvas.toDataURL("image/png"), avatarCanvas)
+  ocr(avatarCanvas.toDataURL("image/png"));
 }
 
 function createImg(src) {
@@ -532,7 +535,7 @@ function keyPressed(e) {
       drag = false;
       var ctx = maimCanvas.getContext('2d');
       ctx.clearRect(0,0,canvas.width,canvas.height);
-      if(notifyPopup) notifyPopup.close();
+      closeOCRWindow();
       break;
     case 190: //.
       document.documentElement.classList.toggle("hide-scrollbar");

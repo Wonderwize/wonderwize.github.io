@@ -95,18 +95,18 @@ body.dark .notify {
   background-color: #262626;
 }
 
-body.dark .notify__text, body.dark .notify__title,
-body.dark .notify__close {
+body.dark .notify__text {
   color: #fff;
+}
+
+.notify__text p {
+  font-size: 125%;
+  margin: 0.25em 0 0 0.25em;
+  text-align:center;
 }
 
 .notify {
   box-shadow: 0px 0px 3px 1px var(--notify-success) !important;
-}
-
-.notify__close {
-  height: 22px !important;
-  width: 22px !important;
 }
 
 .hidden {
