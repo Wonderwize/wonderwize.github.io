@@ -334,7 +334,7 @@ function closeOCRWindow() {
 
 function ocr(data) {
   closeOCRWindow();
-  fetch('https://hf.space/embed/gryan-galario/manga-ocr-demo/+/api/predict/', { method: "POST", body: JSON.stringify({"data":[data]}), headers: { "Content-Type": "application/json" } }).then(function(response) { return response.json(); }).then(function(json_response){
+  fetch('https://wonderwize-manga-ocr-demo.hf.space/+/api/predict/', { method: "POST", body: JSON.stringify({"data":[data]}), headers: { "Content-Type": "application/json" } }).then(function(response) { return response.json(); }).then(function(json_response){
     let parsedData = json_response.data.toString();
     navigator.clipboard.writeText(parsedData);
     const config = readConfig();
