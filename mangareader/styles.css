@@ -299,6 +299,10 @@ a[href='#_none'], a[href*='#_-'], .hide-nav a[href*='#_'] {
   text-align: center;
 }
 
+#drop-zone a {
+  color: #fff;
+}
+
 .file-label {
   width: 360px;
   background-color: rgba(38,40,41,.8);

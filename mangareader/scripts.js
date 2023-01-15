@@ -335,7 +335,7 @@ function closeOCRWindow() {
 function ocr(data) {
   closeOCRWindow();
   fetch('https://wonderwize-manga-ocr-demo.hf.space/api/predict/', { method: "POST", body: JSON.stringify({"data":[data]}), headers: { "Content-Type": "application/json" } }).then(function(response) { return response.json(); }).then(function(json_response){
-    console.log(json_response)
+    //console.log(json_response)
     let parsedData = json_response.data.toString();
     navigator.clipboard.writeText(parsedData);
     const config = readConfig();
